@@ -7,7 +7,7 @@ import LinearGradient from 'react-native-linear-gradient';
 
 const App = () => {
   const [level, setLevel] = useState(1);
-  const [completedLevels, setCompletedLevels] = useState(1);
+  const [completedLevels, setCompletedLevels] = useState(0);
   const [score, setScore] = useState(0);
   const [num1, setNum1] = useState(null);
   const [num2, setNum2] = useState(null);
@@ -17,6 +17,7 @@ const App = () => {
   const [showGameScreen, setShowGameScreen] = useState(false);
   const [notification, setNotification] = useState('');
   const [canvasText, setCanvasText] = useState([]);
+  const [showStartButton, setShowStartButton] = useState(true);
   const [showAnswerButton, setShowAnswerButton] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const levelsPerPage = 5;
@@ -51,11 +52,10 @@ const App = () => {
   };
 
   const saveGameState = async () => {
-    await saveData('level', level); // Save the current level
-    await saveData('score', score); // Save the current score
-    await saveData('completedLevels', completedLevels); // Save the number of completed levels
+    await saveData('level', level);
+    await saveData('score', score);
+    await saveData('completedLevels', completedLevels);
   };
-
 
   const loadGameState = async () => {
     const savedLevel = await loadData('level');
@@ -109,7 +109,7 @@ const App = () => {
         range = 34;
         break;
       case 14:
-        range = 36;
+        range = 34;
         break;
       case 15:
         range = 36;
@@ -117,36 +117,38 @@ const App = () => {
       default:
         range = 10;
     }
-
     setNum1(Math.floor(Math.random() * range + 1));
     setNum2(Math.floor(Math.random() * range + 1));
     setInput1('');
     setInput2('');
-
-    // After this, you can show hints and the next level's game state
-    setTimeout(() => {
-      let add = num1 + num2;
-      let sub = num1 - num2;
-      let mul = num1 * num2;
-      let dv = num2 !== 0 ? num1 / num2 : 'Cannot divide by zero';
-      let div = Math.floor(dv * 100) / 100;
-      setCanvasText([`___Hint___`, `Add(A + B) : ${add}`, `Sub(A - B) : ${sub}`, `Mul (A * B) : ${mul}`, `Div(A / B) : ${div}`]);
-      setShowAnswerButton(true);
-    }, 0);
+    setCanvasText([]);
+    setShowStartButton(true);
+    setShowAnswerButton(false);
   };
 
-
   const startGame = (lvl) => {
-    if (lvl <= completedLevels) {
+    if ((lvl == 1) || (lvl <= completedLevels + 1)) {
       setLevel(lvl);
       setShowLevelSelection(false);
       setShowGameScreen(true);
+
     } else {
       setModalMessage('Level is locked. Complete previous levels.');
       setIsModalVisible(true);
     }
   };
 
+  const calculate = () => {
+    let add = num1 + num2;
+    let sub = num1 - num2;
+    let mul = num1 * num2;
+    let dv = num2 !== 0 ? num1 / num2 : 'Cannot divide by zero';
+    let div = Math.floor(dv * 100) / 100;
+
+    setCanvasText(['___Hint___', `Add(A + B) : ${add}`, `Sub(A - B) : ${sub}`, `Mul (A * B) : ${mul}`, `Div(A / B) : ${div}`]);
+    setShowStartButton(false);
+    setShowAnswerButton(true);
+  };
 
   const check = () => {
     if (input1 === '' || input2 === '' || isNaN(input1) || isNaN(input2)) {
@@ -162,30 +164,31 @@ const App = () => {
     if (correct1) message += 'First number is correct\n';
     else message += 'First number is wrong!\n';
 
-    if (correct2) message += 'Second number is correct\n ';
+    if (correct2) message += 'Second number is correct\n';
     else message += 'Second number is wrong!\n';
 
     if (correct1 && correct2) {
       setNotification('Level Completed!');
+    } else {
+      setNotification(message);
     }
+
     setModalMessage(message);
     setIsModalVisible(true);
 
     if (correct1 && correct2) {
-      setCompletedLevels(prevLevel => prevLevel + 1); // Increment completed levels correctly
+      if (level - 1 == completedLevels) {
+        setCompletedLevels(completedLevels + 1);
+      }
       setScore(score + 10);
-      saveGameState();  // Save the updated completed levels and score
+      saveGameState();
       setTimeout(() => {
-        setShowLevelSelection(true); // Show the level selection screen after completion
-        setShowGameScreen(false); // Hide the game screen
+        setNotification('');
+        setShowLevelSelection(true);
+        setShowGameScreen(false);
       }, 200);
     }
-    else {
-      setScore(score - 5);
-    }
   };
-
-
 
   const home = () => {
     setShowLevelSelection(false);
@@ -194,17 +197,12 @@ const App = () => {
   };
 
   const showResult = () => {
-    setCanvasText(['___Answer___',
-      '-------------------',
-      `A is : ${num1}`,
-      `B is : ${num2}`,
-      '--------------------']);
-
+    setCanvasText(['___Answer___', '-------------------', `A is : ${num1}`, `B is : ${num2}`, '--------------------']);
+    setShowStartButton(false);
   };
 
   const handleNextPage = () => {
-    setCurrentPage((prevPage) => Math.min(prevPage + 1,
-      Math.ceil(15 / levelsPerPage)));
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, Math.ceil(15 / levelsPerPage)));
   };
 
   const handlePreviousPage = () => {
@@ -223,7 +221,7 @@ const App = () => {
         onPress={() => startGame(lvl)}
         disabled={lvl > completedLevels + 1}
       >
-        <Text style={styles.lvltxt} >Level {lvl}</Text>
+        <Text style={styles.lvltxt}>Level {lvl}</Text>
       </TouchableOpacity>
     ));
   };
@@ -231,13 +229,13 @@ const App = () => {
   const renderPagination = () => (
     <View style={styles.paginationContainer}>
       <TouchableOpacity style={styles.pageBtn} onPress={handlePreviousPage} disabled={currentPage === 1}>
-        <Icon name="chevron-left" size={40} color="blue" />
+        <Icon name="chevron-left" size={30} color="#4F8EF7" />
       </TouchableOpacity>
       <View style={styles.lvlcontainer}>
         {renderLevels()}
       </View>
       <TouchableOpacity style={styles.pageBtn} onPress={handleNextPage} disabled={currentPage === Math.ceil(15 / levelsPerPage)}>
-        <Icon name="chevron-right" size={40} color="blue" />
+        <Icon name="chevron-right" size={30} color="#4F8EF7" />
       </TouchableOpacity>
     </View>
   );
@@ -247,17 +245,16 @@ const App = () => {
       {/* Level Selection */}
       {showLevelSelection && (
         <View>
-          <Text style={styles.lvltitxt}>Select Level</Text>
+          <Text style={styles.lvltitxt}>Select The Levels</Text>
           <LinearGradient
-            colors={['#FFFFB5', '#247BA0']}
-            useAngle={true} angle={180}
-            angleCenter={{ x: 0.5, y: 0.5 }}>
-
+            colors={['#FFFFB5', '#247BA0', '#70C1B3']}
+            useAngle={true} angle={120}
+            angleCenter={{ x: 0.5, y: 0.5 }}
+          >
             <View style={styles.paginationContainer}>
               {renderPagination()}
             </View>
           </LinearGradient>
-
         </View>
       )}
 
@@ -286,10 +283,17 @@ const App = () => {
           </View>
           <View style={styles.titlecontainer}>
             <Text style={styles.titxt}>Guess The Numbers</Text>
-            <Text style={styles.titxt}>Level: {level} | Score: {score}</Text>
+            <Text style={styles.sctxt}>Level: {level} | Score: {score}</Text>
           </View>
           <View style={styles.canvacontainer}>
             <View style={styles.canvas}>
+              <View style={styles.txtbot}>
+                {showStartButton && (
+                  <TouchableOpacity onPress={calculate}>
+                    <Icon name="play-circle" size={60} color="#4F8EF7" />
+                  </TouchableOpacity>
+                )}
+              </View>
               {canvasText.map((text, index) => (
                 <Text style={styles.cantxt} key={index}>{text}</Text>
               ))}
@@ -310,29 +314,23 @@ const App = () => {
                 onChangeText={setInput2}
               />
             </View>
-          
-
-              {showAnswerButton && (
-                <View style={styles.checkcontainer}>
+            {showAnswerButton && (
+              <View style={styles.checkcontainer}>
                 <TouchableOpacity style={styles.checkbtn} onPress={check}>
-                <Text style={styles.checktxt}>Check Numbers</Text>
-              </TouchableOpacity>
+                  <Text style={styles.checktxt}>Check Numbers</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.checkbtn} onPress={showResult}>
                   <Text style={styles.checktxt}>Show Answers</Text>
                 </TouchableOpacity>
-                </View>
-              )}
-            
+              </View>
+            )}
           </View>
         </View>
+
       )}
       {/* Modal for showing feedback */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={() => setIsModalVisible(false)}
-      >
+
+      <Modal animationType="slide" transparent={true} visible={isModalVisible} onRequestClose={() => setIsModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalMessage}>{modalMessage} {notification}</Text>
@@ -350,21 +348,24 @@ const App = () => {
           </View>
         </View>
       </Modal>
+
+
+
     </View>
   );
 };
 
+
+
 //stylesheet 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(204, 223, 240, 0.88)',
+    backgroundColor: 'white',
     padding: 10,
     borderColor: 'rgba(23, 113, 197, 0.75)',
-    maxWidth: wp('100%'),
-    maxHeight: hp('100%'),
   },
   first: {
     justifyContent: 'center',
@@ -373,13 +374,12 @@ const styles = StyleSheet.create({
     bottom: wp('10%'),
   },
   firstimage: {
-    maxWidth: wp('100%'),
-    maxHeight: hp('30%'),
+    maxWidth: wp('50%'),
+    maxHeight: hp('25%'),
     resizeMode: 'contain',
   },
   txt: {
-    maxWidth: wp('100%'),
-    fontSize: wp('6%'),
+    fontSize: wp('7%'),
     fontWeight: 'bold',
     color: 'black',
     margin: wp('2%'),
@@ -400,42 +400,40 @@ const styles = StyleSheet.create({
     fontSize: wp('5%'),
     fontWeight: 'bold',
   },
-
   lvlcontainer: {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     maxWidth: wp('100%'),
-    margin: wp('15'),
-    //borderWidth: 3,
+    margin: wp('10')
+    // borderWidth: 3,
   },
   lvltitxt: {
-    fontSize: wp('8%'),
+    fontSize: wp('7%'),
     fontWeight: 'bold',
-    color: 'blue',
+    color: 'black',
     margin: wp('1%'),
     textAlign: 'center',
-    //top: hp('2%'),
   },
   paginationContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    //margin: 1,
+    margin: 2,
     maxWidth: wp('100%'),
 
   },
   pageBtn: {
-    padding: 8, //important
-    //margin: 2,
+    padding: 10,
+    margin: 5,
     borderRadius: 5,
 
   },
   btn: {
     justifyContent: 'center',
     alignItems: 'center',
-    maxWidth: wp('45%'),
-    backgroundColor: 'white',
+    maxWidth: wp('50%'),
+    backgroundColor: 'rgb(230, 238, 235)',
     borderWidth: wp('1%'),
     borderColor: 'rgba(10, 127, 236, 0.75)',
     padding: wp('2%'),
@@ -450,7 +448,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
   },
-
   locked: {
     backgroundColor: 'gray',
   },
@@ -462,15 +459,16 @@ const styles = StyleSheet.create({
 
   gamecontainer: {
     maxWidth: wp('95%'),
-    maxHeight: hp('90%'),
+    maxHeight: hp('80%'),
+    bottom:20,
   },
   navbar: {
-    padding: 9,
+    padding: 5,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    margin: 3,
-    maxHeight: hp('20%'),
+    margin: 5,
+    maxHeight: hp('10%'),
   },
   navbtn: {
     backgroundColor: 'rgb(168, 184, 202)',
@@ -480,76 +478,87 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(10, 127, 236, 0.75)',
   },
   navtxt: {
-    fontSize: wp('6%'),
+    fontSize: 20,
     fontWeight: 'bold',
     color: 'black',
   },
   titlecontainer: {
-    maxwidth: wp('100%'),
     flexDirection: 'column',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
     alignItems: 'center',
-    //top: 2,
+    top: 5,
   },
   titxt: {
     fontSize: wp('6%'),
     fontWeight: 'bold'
   },
+  sctxt: {
+    fontSize: wp('5%'),
+    fontWeight: 'bold'
 
+  },
+    //canva style
   canvacontainer: {
-    maxWidth: wp('100%'),
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    //top: 5,
-
+    top: 20,
   },
   canvas: {
-    maxWidth: wp('110%'),
-    maxHeight: hp('50%'),
+    maxWidth: wp('100%'),
+    maxHeight: hp('40%'),
     backgroundColor: 'rgba(204, 223, 240, 0.88)',
     borderRadius: 10,
+    borderWidth: wp('.5%'),
+    borderColor: 'blue',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 6,
-    marginBottom: 20,
+    padding: 10,
+    marginBottom: 8,
   },
   txtbot: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-
+    //marginBottom: 5,
   },
-  cantxt: {
-    fontSize: wp('6%'),
+  /*
+  startbtn: {
+    backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: 10,
+  },
+  starttxt: {
     color: 'black',
-    fontWeight: 'bold',
-  },
-  inputcontainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    //aspectRatio: 3,
-    maxwidth: wp('100%'),
-  },
-  inputtxt: {
-    maxWidth: wp('100%'),
-    maxHeight: hp('10%'),
-    backgroundColor: 'rgba(204, 238, 240, 0.88)',
-    borderColor: 'rgba(10, 127, 236, 0.75)',
-    borderWidth: wp('2%'),
-    borderRadius: wp('2%'),
-    margin: wp('1%'),
-    padding: wp('2%'),
     fontSize: wp('5%'),
     fontWeight: 'bold',
   },
-  checkcontainer: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    //top: 5,
+  */
+  cantxt: {
+    fontSize: wp('5%'),
+    color: 'black',
+    marginBottom: 5,
+    fontWeight: 'bold',
   },
 
+  //input style
+  inputcontainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    aspectRatio: 4
+  },
+  inputtxt: {
+    maxWidth: wp('100%'),
+    maxHeight: hp('9%'),
+    borderColor: 'rgba(10, 127, 236, 0.75)',
+    borderWidth: wp('2%'),
+    borderRadius: wp('2%'),
+    margin: 2,
+    //padding: 6,
+    fontSize: wp('5%'),
+    
+  },
+  //check and show button style
   checkbtn: {
     alignItems: 'center',
     backgroundColor: 'rgba(233, 224, 206, 0.75)',
@@ -560,14 +569,15 @@ const styles = StyleSheet.create({
 
   },
   checktxt: {
-    fontSize: wp('6%'),
-    fontWeight: 'bold',
+    fontSize: wp('7%'),
+    fontWeight:'bold',
   },
-  
+
   image: {
     maxHeight: hp('10%'),
     maxWidth: wp('20%'),
   },
+ //model containner style
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -575,8 +585,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: wp('80%'),
-    padding: 20,
+    width: wp('90%'),
+    padding: 18,
     backgroundColor: 'rgba(204, 223, 240, 0.88)',
     borderRadius: 10,
     alignItems: 'center',
@@ -584,25 +594,19 @@ const styles = StyleSheet.create({
   modalMessage: {
     justifyContent: 'center',
     alignItems: 'center',
-
     fontSize: wp('6%'),
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  iconBtn: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: wp('60%'),
-  },
-  closeBtn: {
+
+closeBtn: {
     marginTop: 20,
     padding: 5,
     backgroundColor: 'rgba(204, 223, 240, 0.88)',
     borderWidth: 4,
     borderColor: 'rgba(10, 127, 236, 0.75)',
     borderRadius: 5,
-    paddingEnd: 10,
+   
   },
 
   tryBtn: {
@@ -611,9 +615,21 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(204, 223, 240, 0.88)',
     borderWidth: 4,
     borderColor: 'rgba(10, 127, 236, 0.75)',
-    borderRadius: 5,
+    borderRadius: 5
+  
   },
+  iconBtn: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: wp('60%'),
+  },
+
+ 
 
 });
 
 export default App;
+
+
+
