@@ -301,14 +301,14 @@ const App = () => {
             <View style={styles.inputcontainer}>
               <TextInput
                 style={styles.inputtxt}
-                placeholder="A:num"
+                placeholder="A:no"
                 keyboardType="numeric"
                 value={input1}
                 onChangeText={setInput1}
               />
               <TextInput
                 style={styles.inputtxt}
-                placeholder="B:num"
+                placeholder="B:no"
                 keyboardType="numeric"
                 value={input2}
                 onChangeText={setInput2}
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
   gamecontainer: {
     maxWidth: wp('95%'),
     maxHeight: hp('80%'),
-    bottom:20,
+    bottom: 20,
   },
   navbar: {
     padding: 5,
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
 
   },
-    //canva style
+  //canva style
   canvacontainer: {
     flexDirection: 'column',
     justifyContent: 'center',
@@ -544,19 +544,19 @@ const styles = StyleSheet.create({
   //input style
   inputcontainer: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    aspectRatio: 4
+    justifyContent: 'center',
   },
   inputtxt: {
-    maxWidth: wp('100%'),
-    maxHeight: hp('9%'),
+    width: wp('25%'),  
     borderColor: 'rgba(10, 127, 236, 0.75)',
     borderWidth: wp('2%'),
     borderRadius: wp('2%'),
-    margin: 2,
+    margin: 4,
     //padding: 6,
     fontSize: wp('5%'),
-    
+    fontWeight:'bold'
+
+
   },
   //check and show button style
   checkbtn: {
@@ -570,14 +570,14 @@ const styles = StyleSheet.create({
   },
   checktxt: {
     fontSize: wp('7%'),
-    fontWeight:'bold',
+    fontWeight: 'bold',
   },
 
   image: {
     maxHeight: hp('10%'),
     maxWidth: wp('20%'),
   },
- //model containner style
+  //model containner style
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -599,14 +599,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-closeBtn: {
+  closeBtn: {
     marginTop: 20,
     padding: 5,
     backgroundColor: 'rgba(204, 223, 240, 0.88)',
     borderWidth: 4,
     borderColor: 'rgba(10, 127, 236, 0.75)',
     borderRadius: 5,
-   
+
   },
 
   tryBtn: {
@@ -616,7 +616,7 @@ closeBtn: {
     borderWidth: 4,
     borderColor: 'rgba(10, 127, 236, 0.75)',
     borderRadius: 5
-  
+
   },
   iconBtn: {
     flexDirection: 'row',
@@ -625,11 +625,8 @@ closeBtn: {
     width: wp('60%'),
   },
 
- 
+
 
 });
 
 export default App;
-
-
-
