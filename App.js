@@ -298,30 +298,33 @@ const App = () => {
                 <Text style={styles.cantxt} key={index}>{text}</Text>
               ))}
             </View>
-            <View style={styles.inputcontainer}>
-              <TextInput
-                style={styles.inputtxt}
-                placeholder="A:no"
-                keyboardType="numeric"
-                value={input1}
-                onChangeText={setInput1}
-              />
-              <TextInput
-                style={styles.inputtxt}
-                placeholder="B:no"
-                keyboardType="numeric"
-                value={input2}
-                onChangeText={setInput2}
-              />
-            </View>
+
             {showAnswerButton && (
-              <View style={styles.checkcontainer}>
-                <TouchableOpacity style={styles.checkbtn} onPress={check}>
-                  <Text style={styles.checktxt}>Check Numbers</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.checkbtn} onPress={showResult}>
-                  <Text style={styles.checktxt}>Show Answers</Text>
-                </TouchableOpacity>
+              <View>
+                <View style={styles.inputcontainer}>
+                  <TextInput
+                    style={styles.inputtxt}
+                    placeholder="A:num"
+                    keyboardType="numeric"
+                    value={input1}
+                    onChangeText={setInput1}
+                  />
+                  <TextInput
+                    style={styles.inputtxt}
+                    placeholder="B:num"
+                    keyboardType="numeric"
+                    value={input2}
+                    onChangeText={setInput2}
+                  />
+                </View>
+                <View style={styles.checkcontainer}>
+                  <TouchableOpacity style={styles.checkbtn} onPress={check}>
+                    <Text style={styles.checktxt}>Check Numbers</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.checkbtn} onPress={showResult}>
+                    <Text style={styles.checktxt}>Show Answers</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             )}
           </View>
@@ -333,29 +336,16 @@ const App = () => {
       <Modal animationType="slide" transparent={true} visible={isModalVisible} onRequestClose={() => setIsModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalMessage}>{modalMessage} {notification}</Text>
-            <View style={styles.iconBtn}>
-              <TouchableOpacity style={styles.tryBtn} onPress={() => {
-                setIsModalVisible(false);
-                restartGame();
-              }}>
-                <Icon name="close" size={30} color="#4F8EF7" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.closeBtn} onPress={() => setIsModalVisible(false)}>
-                <Icon name="check" size={30} color="#4F8EF7" />
-              </TouchableOpacity>
-            </View>
+            <Text style={styles.modalMessage}>{modalMessage}</Text>
+            <TouchableOpacity style={styles.closeBtn} onPress={() => setIsModalVisible(false)}>
+              <Text style={styles.okstyle}>OK</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
-
-
-
     </View>
   );
 };
-
-
 
 //stylesheet 
 const styles = StyleSheet.create({
@@ -547,16 +537,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   inputtxt: {
-    width: wp('25%'),  
+    width: wp('25%'),
     borderColor: 'rgba(10, 127, 236, 0.75)',
     borderWidth: wp('2%'),
     borderRadius: wp('2%'),
     margin: 4,
     //padding: 6,
     fontSize: wp('5%'),
-    fontWeight:'bold'
-
-
+    fontWeight: 'bold'
   },
   //check and show button style
   checkbtn: {
@@ -577,6 +565,7 @@ const styles = StyleSheet.create({
     maxHeight: hp('10%'),
     maxWidth: wp('20%'),
   },
+
   //model containner style
   modalContainer: {
     flex: 1,
@@ -598,35 +587,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-
   closeBtn: {
     marginTop: 20,
     padding: 5,
-    backgroundColor: 'rgba(204, 223, 240, 0.88)',
+    backgroundColor: 'rgba(181, 214, 243, 0.88)',
     borderWidth: 4,
-    borderColor: 'rgba(10, 127, 236, 0.75)',
+    borderColor: 'rgba(29, 25, 25, 0.36)',
     borderRadius: 5,
-
+    left:110,
   },
-
-  tryBtn: {
-    marginTop: 20,
-    padding: 5,
-    backgroundColor: 'rgba(204, 223, 240, 0.88)',
-    borderWidth: 4,
-    borderColor: 'rgba(10, 127, 236, 0.75)',
-    borderRadius: 5
-
-  },
-  iconBtn: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: wp('60%'),
-  },
-
-
-
+  okstyle:{
+    fontSize:20,
+    fontWeight:'bold',
+  }
 });
-
 export default App;
