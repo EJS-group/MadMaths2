@@ -18,8 +18,7 @@
         android:windowSoftInputMode="adjustResize"
         android:exported="true"
         android:screenOrientation="portrait"
-        android:theme="@style/Theme.App.SplashScreen"
-        android:hardwareAccelerated="true">
+      >
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />

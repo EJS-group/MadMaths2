@@ -302,6 +302,7 @@ const App = () => {
             {showAnswerButton && (
               <View>
                 <View style={styles.inputcontainer}>
+                <Text style={styles.intext}>A:</Text>
                   <TextInput
                     style={styles.inputtxt}
                     placeholder="A:num"
@@ -309,6 +310,7 @@ const App = () => {
                     value={input1}
                     onChangeText={setInput1}
                   />
+                  <Text style={styles.intext}>B:</Text>
                   <TextInput
                     style={styles.inputtxt}
                     placeholder="B:num"
@@ -316,7 +318,9 @@ const App = () => {
                     value={input2}
                     onChangeText={setInput2}
                   />
+                  
                 </View>
+
                 <View style={styles.checkcontainer}>
                   <TouchableOpacity style={styles.checkbtn} onPress={check}>
                     <Text style={styles.checktxt}>Check Numbers</Text>
@@ -535,13 +539,20 @@ const styles = StyleSheet.create({
   inputcontainer: {
     flexDirection: 'row',
     justifyContent: 'center',
+    alignItems:'center'
+  },
+  intext:{
+    fontSize:hp('3%'),
+    fontWeight:'bold',
+    justifyContent:'center',
+    verticalAlign:'middle',
   },
   inputtxt: {
     width: wp('25%'),
     borderColor: 'rgba(10, 127, 236, 0.75)',
     borderWidth: wp('2%'),
     borderRadius: wp('2%'),
-    margin: 4,
+    margin: 3,
     //padding: 6,
     fontSize: wp('5%'),
     fontWeight: 'bold'
