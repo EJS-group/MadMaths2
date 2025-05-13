@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import LinearGradient from 'react-native-linear-gradient';
+import { ThemedButton } from "react-native-really-awesome-button";
 
 const App = () => {
   const [level, setLevel] = useState(1);
@@ -262,9 +263,11 @@ const App = () => {
         <View style={styles.first}>
           <Image style={styles.firstimage} source={require('./image/logo.png')} />
           <Text style={styles.txt}>GuessTheNumber</Text>
-          <TouchableOpacity style={styles.button} onPress={() => setShowLevelSelection(true)}>
+          {/* <TouchableOpacity style={styles.button} onPress={() => setShowLevelSelection(true)}>
             <Text style={styles.playtxt}>Play</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+         <ThemedButton name="bruce" type="secondary" style={styles.button} onPress={() => setShowLevelSelection(true)}>
+          <Text style={styles.playtxt}>Play</Text></ThemedButton>
         </View>
       )}
 
@@ -376,21 +379,22 @@ const styles = StyleSheet.create({
     color: 'black',
     margin: wp('2%'),
   },
-  button: {
-    backgroundColor: 'rgba(130, 168, 202, 0.75)',
-    padding: wp('3%'),
-    borderRadius: wp('4%'),
-    shadowColor: '#000',
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: wp('0.4%'),
-    shadowRadius: wp('3%'),
-    borderColor: 'rgba(10, 127, 236, 0.75)',
-    borderWidth: wp('1%'),
-  },
+  // button: {
+  //   // backgroundColor: 'rgba(130, 168, 202, 0.75)',
+  //   // padding: wp('3%'),
+  //   // borderRadius: wp('4%'),
+  //   // shadowColor: '#000',
+  //   // shadowOffset: { width: 2, height: 2 },
+  //   // shadowOpacity: wp('0.4%'),
+  //   // shadowRadius: wp('3%'),
+  //   // borderColor: 'rgba(10, 127, 236, 0.75)',
+  //   // borderWidth: wp('1%'),
+
+  // },
   playtxt: {
-    color: 'black',
-    fontSize: wp('5%'),
+    fontSize: wp('7%'),
     fontWeight: 'bold',
+    color: 'rgb(206, 100, 51)', 
   },
   lvlcontainer: {
     flexDirection: 'column',
@@ -441,7 +445,7 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   locked: {
-    backgroundColor: 'gray',
+    backgroundColor: 'rgba(15, 236, 218, 0.5)',
   },
   notification: {
     fontSize: 24,
