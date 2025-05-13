@@ -15,7 +15,7 @@ const App = () => {
   const [input2, setInput2] = useState('');
   const [showLevelSelection, setShowLevelSelection] = useState(false);
   const [showGameScreen, setShowGameScreen] = useState(false);
-  const [notification, setNotification] = useState('');
+  // Removed unused notification state
   const [canvasText, setCanvasText] = useState([]);
   const [showStartButton, setShowStartButton] = useState(true);
   const [showAnswerButton, setShowAnswerButton] = useState(false);
@@ -28,11 +28,11 @@ const App = () => {
 
   useEffect(() => {
     loadGameState();
-  }, []);
+  }, [loadGameState]);
 
   useEffect(() => {
     restartGame();
-  }, [level]);
+  }, [level, restartGame]);
 
   const saveData = async (key, value) => {
     try {
@@ -57,16 +57,16 @@ const App = () => {
     await saveData('completedLevels', completedLevels);
   };
 
-  const loadGameState = async () => {
+  const loadGameState = React.useCallback(async () => {
     const savedLevel = await loadData('level');
     const savedScore = await loadData('score');
     const savedCompletedLevels = await loadData('completedLevels');
-    if (savedLevel !== null) setLevel(savedLevel);
-    if (savedScore !== null) setScore(savedScore);
-    if (savedCompletedLevels !== null) setCompletedLevels(savedCompletedLevels);
-  };
+    if (savedLevel !== null) { setLevel(savedLevel); }
+    if (savedScore !== null) { setScore(savedScore); }
+    if (savedCompletedLevels !== null) { setCompletedLevels(savedCompletedLevels); }
+  }, []);
 
-  const restartGame = () => {
+  const restartGame = React.useCallback(() => {
     let range;
     switch (level) {
       case 1:
@@ -124,10 +124,10 @@ const App = () => {
     setCanvasText([]);
     setShowStartButton(true);
     setShowAnswerButton(false);
-  };
+  }, [level]);
 
   const startGame = (lvl) => {
-    if ((lvl == 1) || (lvl <= completedLevels + 1)) {
+    if ((lvl === 1) || (lvl <= completedLevels + 1)) {
       setLevel(lvl);
       setShowLevelSelection(false);
       setShowGameScreen(true);
@@ -157,33 +157,32 @@ const App = () => {
       return;
     }
 
-    let correct1 = parseInt(input1) === num1;
-    let correct2 = parseInt(input2) === num2;
+    let correct1 = parseInt(input1, 10) === num1;
+    let correct2 = parseInt(input2, 10) === num2;
 
     let message = '';
-    if (correct1) message += 'First number is correct\n';
-    else message += 'First number is wrong!\n';
+    if (correct1) { message += 'First number is correct\n'; }
+    else { message += 'First number is wrong!\n'; }
 
-    if (correct2) message += 'Second number is correct\n';
-    else message += 'Second number is wrong!\n';
+    if (correct2) { message += 'Second number is correct\n'; }
+    else { message += 'Second number is wrong!\n'; }
 
-    if (correct1 && correct2) {
-      setNotification('Level Completed!');
-    } else {
-      setNotification(message);
-    }
+    // if (correct1 && correct2) {
+    //   // setNotification('Level Completed!'); // Removed undefined function
+    // } else {
+    //   // setNotification(message); // Removed undefined function
+    // }
 
     setModalMessage(message);
     setIsModalVisible(true);
 
     if (correct1 && correct2) {
-      if (level - 1 == completedLevels) {
+      if (level - 1 === completedLevels) {
         setCompletedLevels(completedLevels + 1);
       }
       setScore(score + 10);
       saveGameState();
       setTimeout(() => {
-        setNotification('');
         setShowLevelSelection(true);
         setShowGameScreen(false);
       }, 200);
@@ -302,7 +301,7 @@ const App = () => {
             {showAnswerButton && (
               <View>
                 <View style={styles.inputcontainer}>
-                <Text style={styles.intext}>A:</Text>
+                  <Text style={styles.intext}>A:</Text>
                   <TextInput
                     style={styles.inputtxt}
                     placeholder="A:num"
@@ -318,7 +317,6 @@ const App = () => {
                     value={input2}
                     onChangeText={setInput2}
                   />
-                  
                 </View>
 
                 <View style={styles.checkcontainer}>
@@ -351,7 +349,7 @@ const App = () => {
   );
 };
 
-//stylesheet 
+//stylesheet
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -399,7 +397,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     maxWidth: wp('100%'),
-    margin: wp('10')
+    margin: wp('10'),
     // borderWidth: 3,
   },
   lvltitxt: {
@@ -484,11 +482,11 @@ const styles = StyleSheet.create({
   },
   titxt: {
     fontSize: wp('6%'),
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   sctxt: {
     fontSize: wp('5%'),
-    fontWeight: 'bold'
+    fontWeight: 'bold',
 
   },
   //canva style
@@ -539,13 +537,13 @@ const styles = StyleSheet.create({
   inputcontainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems:'center'
+    alignItems: 'center',
   },
-  intext:{
-    fontSize:hp('3%'),
-    fontWeight:'bold',
-    justifyContent:'center',
-    verticalAlign:'middle',
+  intext: {
+    fontSize: hp('3%'),
+    fontWeight: 'bold',
+    justifyContent: 'center',
+    verticalAlign: 'middle',
   },
   inputtxt: {
     width: wp('25%'),
@@ -555,7 +553,7 @@ const styles = StyleSheet.create({
     margin: 3,
     //padding: 6,
     fontSize: wp('5%'),
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   //check and show button style
   checkbtn: {
@@ -605,11 +603,11 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: 'rgba(29, 25, 25, 0.36)',
     borderRadius: 5,
-    left:110,
+    left: 110,
   },
-  okstyle:{
-    fontSize:20,
-    fontWeight:'bold',
-  }
+  okstyle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
 });
 export default App;
